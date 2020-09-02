@@ -30,17 +30,13 @@ object LocationSerializer
      */
     fun deserialize(obj: JSONObject): Location
     {
-        return if (obj.containsKey("==")) { // Location was serialized using ConfigurationSerializable method
-            SerializationHelper.deserialize(obj as Map<String, Any>) as Location
-        } else { // Location was serialized by hand
-            val world = Bukkit.getWorld(obj["world"] as String)
-            val x = NumberConversions.toDouble(obj["x"])
-            val y = NumberConversions.toDouble(obj["y"])
-            val z = NumberConversions.toDouble(obj["z"])
-            val pitch = NumberConversions.toFloat(obj["pitch"])
-            val yaw = NumberConversions.toFloat(obj["yaw"])
+        val world = Bukkit.getWorld(obj["world"] as String)
+        val x = NumberConversions.toDouble(obj["x"])
+        val y = NumberConversions.toDouble(obj["y"])
+        val z = NumberConversions.toDouble(obj["z"])
+        val pitch = NumberConversions.toFloat(obj["pitch"])
+        val yaw = NumberConversions.toFloat(obj["yaw"])
 
-            Location(world, x, y, z, yaw, pitch)
-        }
+        return Location(world, x, y, z, yaw, pitch)
     }
 }

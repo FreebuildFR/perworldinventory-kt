@@ -152,7 +152,7 @@ class FlatFile @Inject constructor(@DataDirectory private val dataDirectory: Fil
             val parser = JSONParser(JSONParser.USE_INTEGER_STORAGE)
             val data = parser.parse(it) as JSONObject
 
-            return LocationSerializer.deserialize(data)
+            return runCatching { LocationSerializer.deserialize(data) }.getOrNull()
         }
     }
 

@@ -13,8 +13,9 @@ import me.ebonjaeger.perworldinventory.initialization.DataDirectory
 import me.ebonjaeger.perworldinventory.initialization.Injector
 import me.ebonjaeger.perworldinventory.initialization.InjectorBuilder
 import me.ebonjaeger.perworldinventory.initialization.PluginFolder
-import me.ebonjaeger.perworldinventory.listener.entity.EntityPortalEventListener
-import me.ebonjaeger.perworldinventory.listener.player.*
+import me.ebonjaeger.perworldinventory.listener.player.PlayerChangedWorldListener
+import me.ebonjaeger.perworldinventory.listener.player.PlayerQuitListener
+import me.ebonjaeger.perworldinventory.listener.player.PlayerSpawnLocationListener
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.Server
@@ -91,10 +92,10 @@ class PerWorldInventory : JavaPlugin
         registerCommands(injector, injector.getSingleton(GroupManager::class))
 
         // Start bStats metrics
-        if (settings.getProperty(MetricsSettings.ENABLE_METRICS))
-        {
-            startMetrics(settings, injector.getSingleton(GroupManager::class))
-        }
+        // if (settings.getProperty(MetricsSettings.ENABLE_METRICS))
+        // {
+        //     startMetrics(settings, injector.getSingleton(GroupManager::class))
+        // }
 
         // Start task to prevent item duping across worlds
         updateTimeoutsTaskId = server.scheduler.scheduleSyncRepeatingTask(
@@ -129,14 +130,14 @@ class PerWorldInventory : JavaPlugin
 
     internal fun injectServices(injector: Injector)
     {
-        server.pluginManager.registerEvents(injector.getSingleton(InventoryCreativeListener::class), this)
-        server.pluginManager.registerEvents(injector.getSingleton(PlayerChangedWorldListener::class), this)
-        server.pluginManager.registerEvents(injector.getSingleton(PlayerGameModeChangeListener::class), this)
-        server.pluginManager.registerEvents(injector.getSingleton(PlayerQuitListener::class), this)
-        server.pluginManager.registerEvents(injector.getSingleton(PlayerTeleportListener::class), this)
-        server.pluginManager.registerEvents(injector.getSingleton(EntityPortalEventListener::class), this)
-        server.pluginManager.registerEvents(injector.getSingleton(PlayerDeathListener::class), this)
-        server.pluginManager.registerEvents(injector.getSingleton(PlayerRespawnListener::class), this)
+//        server.pluginManager.registerEvents(injector.getSingleton(InventoryCreativeListener::class), this)
+//        server.pluginManager.registerEvents(injector.getSingleton(PlayerChangedWorldListener::class), this)
+//        server.pluginManager.registerEvents(injector.getSingleton(PlayerGameModeChangeListener::class), this)
+//        server.pluginManager.registerEvents(injector.getSingleton(PlayerQuitListener::class), this)
+//        server.pluginManager.registerEvents(injector.getSingleton(PlayerTeleportListener::class), this)
+//        server.pluginManager.registerEvents(injector.getSingleton(EntityPortalEventListener::class), this)
+//        server.pluginManager.registerEvents(injector.getSingleton(PlayerDeathListener::class), this)
+//        server.pluginManager.registerEvents(injector.getSingleton(PlayerRespawnListener::class), this)
 
         // The PlayerSpawnLocationEvent is only fired in Spigot
         // As of version 1.9.2

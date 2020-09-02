@@ -2,10 +2,12 @@ package me.ebonjaeger.perworldinventory.listener.player
 
 import me.ebonjaeger.perworldinventory.ConsoleLogger
 import me.ebonjaeger.perworldinventory.GroupManager
+import me.ebonjaeger.perworldinventory.PerWorldInventory
 import me.ebonjaeger.perworldinventory.configuration.PluginSettings
 import me.ebonjaeger.perworldinventory.configuration.Settings
 import me.ebonjaeger.perworldinventory.data.DataSource
 import me.ebonjaeger.perworldinventory.data.ProfileManager
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -13,7 +15,8 @@ import org.spigotmc.event.player.PlayerSpawnLocationEvent
 import javax.inject.Inject
 
 
-class PlayerSpawnLocationListener @Inject constructor(private val dataSource: DataSource,
+class PlayerSpawnLocationListener @Inject constructor(private val perWorldInventory: PerWorldInventory,
+                                                      private val dataSource: DataSource,
                                                       private val groupManager: GroupManager,
                                                       private val settings: Settings,
                                                       private val profileManager: ProfileManager) : Listener
@@ -30,23 +33,25 @@ class PlayerSpawnLocationListener @Inject constructor(private val dataSource: Da
 
         val location = dataSource.getLogout(player)
 
-        if (location == null || location.world == null) { // No valid location found
-            return
-        }
-
         ConsoleLogger.debug("onPlayerSpawn: Logout location found for player '${player.name}': $location")
 
-        val world = location.world
-        if (world!!.name != spawnWorld) { // We saved this Location, so we can assume it has a world
+        if (location?.world?.name != spawnWorld) { // We saved this Location, so we can assume it has a world
             val spawnGroup = groupManager.getGroupFromWorld(spawnWorld)
-            val logoutGroup = groupManager.getGroupFromWorld(world.name)
+            val logoutGroup = location
+                    ?.takeIf { it.world != null }
+                    ?.let { groupManager.getGroupFromWorld(it.world!!.name) }
 
             if (spawnGroup != logoutGroup) {
                 ConsoleLogger.fine("onPlayerSpawn: Current group does not match logout group for '${player.name}'")
                 ConsoleLogger.debug("onPlayerSpawn: spawnGroup=$spawnGroup, logoutGroup=$logoutGroup")
+                ConsoleLogger.info("Inventory of player '${player.name}' restored")
 
-                profileManager.addPlayerProfile(player, logoutGroup, player.gameMode)
+                Bukkit.getScheduler().scheduleSyncDelayedTask(perWorldInventory, {
+                    Bukkit.getPlayer(player.uniqueId)?.performCommand("mvspawn");
+                }, 20L)
+                logoutGroup?.also { profileManager.addPlayerProfile(player, it, player.gameMode) }
                 profileManager.getPlayerData(player, spawnGroup, player.gameMode)
+
             }
         }
     }
